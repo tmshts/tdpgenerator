@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="index.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+        <link href="styles.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <title>
+            TDP Generator
+        </title>
+    </head>
+    <body>
+        <div class="container">
+            <div>
+                <img src="images/fau.png" alt="FAU logo" height="50">
+            </div>
+
+            <div>
+                <h3>Generate Team Design Pattern for Human-Agent Collaboration</h3>
+            </div>
+
+            <div>
+                <img src="images/institut.png" alt="institut logo" height="50">
+            </div>
+        </div>
+
+
+        <p>
+            This website is created for the purpose of a master thesis at the Friedrich-Alexander-Universität Erlangen-Nürnberg (FAU). The name of the thesis is Developing a Modelling Language for Team Design Patterns to Represent Human-Agent Collaboration.
+        </p>
+        <p>
+            <b>Purpose:</b> Provide a user-agnostic modelling language to describe Human-Agent Collaboration to facilitate the comprehension for diverse user groups.
+        </p>
+        <p>
+            <b>Instructions:</b> After clicking on "Select Dimensions", certain questions related to Human-Agent Collaboration appear. Then, you answer these questions based on what use case of Human-Agent Collaboration you wish to represent. Consequently, a corresponding Team Design Pattern to represent Human-Agent Collaboration is generated in the grey rectangle on the right side. Furthermore, you are also able to download the generated Team Design Pattern in a .svg file when clicking on "Download .svg".
+        </p>
+
+        <hr>
+
+        <div class="flex-container">
+            <div id="left_container">
+                <div id="select_dimensions"><button class="filter_order_buttons">Select Dimensions</button></div>
+                <div id="filter_div" style="display: none;">
+                        <div><b>Do the human and the agent share the physical work?</b>
+                            <div>
+                                <input type="radio" id="joint_physical_work" name="joint_physical_work" value="none" checked="checked">
+                                <label for="none">N/A</label><br>
+                                <input type="radio" id="joint_physical_work" name="joint_physical_work" value="direct">
+                                <label for="direct">Yes, with the aim of reducing the distance to a common goal.</label><br>
+                                <input type="radio" id="joint_physical_work" name="joint_physical_work" value="indirect">
+                                <label for="indirect">Yes, with the aim at making the team more effective or efficient at achieving the common goal.</label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div><b>Does the human perform physical work?</b>
+                            <div>
+                                <input type="radio" id="human_physical_work" name="human_physical_work" value="none" checked="checked">
+                                <label for="none">N/A</label><br>
+                                <input type="radio" id="human_physical_work" name="human_physical_work" value="direct">
+                                <label for="direct">Yes, with the aim of reducing the distance to a common goal.</label><br>
+                                <input type="radio" id="human_physical_work" name="human_physical_work" value="indirect">
+                                <label for="indirect">Yes, with the aim at making the team more effective or efficient at achieving the common goal.</label>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <div><b>Does the agent perform physical work?</b>
+                            <div>
+                                <input type="radio" id="agent_physical_work" name="agent_physical_work" value="none" checked="checked">
+                                <label for="none">N/A</label><br>
+                                <input type="radio" id="agent_physical_work" name="agent_physical_work" value="direct">
+                                <label for="direct">Yes, with the aim of reducing the distance to a common goal.</label><br>
+                                <input type="radio" id="agent_physical_work" name="agent_physical_work" value="indirect">
+                                <label for="indirect">Yes, with the aim at making the team more effective or efficient at achieving the common goal.</label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div><b>Does the human perform cognitive work?</b>
+                            <div>
+                                <input type="radio" id="human_cognitive_work" name="human_cognitive_work" value="direct" checked="direct">
+                                <label for="direct">Yes, with the aim of reducing the distance to a common goal.</label><br>
+                                <input type="radio" id="human_cognitive_work" name="human_cognitive_work" value="indirect">
+                                <label for="indirect">Yes, with the aim at making the team more effective or efficient at achieving the common goal.</label>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <div><b>Does the agent perform cognitive work?</b>
+                            <div>
+                                <input type="radio" id="agent_cognitive_work" name="agent_cognitive_work" value="direct" checked="direct">
+                                <label for="direct">Yes, with the aim of reducing the distance to the common goal.</label><br>
+                                <input type="radio" id="agent_cognitive_work" name="agent_cognitive_work" value="indirect">
+                                <label for="indirect">Yes, with the aim at making the team more effective or efficient at achieving the common goal.</label><br>                   
+                                <input type="radio" id="agent_cognitive_work" name="agent_cognitive_work" value="minimal">
+                                <label for="minimal">Yes, but only with minimal processing information needed.</label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div><b>What communication channel/(s) is/(are) used in the interaction between the human and the agent?</b>
+                            <div>
+                                <select id="modalities" multiple>
+                                    <option value="visual">Visual</option>
+                                    <option value="audial">Audial</option>
+                                    <option value="haptic">Haptic</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <hr>
+
+                        <div><b>Where are the human and the agent located while interacting with each other?</b>
+                            <div>
+                                <input type="radio" id="location" name="location" value="physical_proximity" checked="physical_proximity">
+                                <label for="physical_proximity">In physical proximity</label><br>
+                                <input type="radio" id="location" name="location" value="remote">
+                                <label for="remote">In remote mode</label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div><b>What is a level of supervision between the actors (the human and the agent)?</b>
+                            <div>
+                                <select id="supervision_level">
+                                    <option value="5">10 - Actor supervises the work of team member. Team member acts autonomously.</option>
+                                    <option value="5">9 - Actor supervises autonomous work of team member. Team member informs actos only if decides to.</option>
+                                    <option value="5">8 - Actor supervises autonomous work of team member. Team member informs actor only if actor asked.</option>
+                                    <option value="4">7 - Actor executes automatically a part of work and then may inform team member.</option>
+                                    <option value="3">6 - Actor allows team member a restricted time to veto before execution.</option>
+                                    <option value="3">5 - Actor executes a command/instruction/suggestion from team member if team member approves.</option>
+                                    <option value="2">4 - Actor suggests 1 alternative to team member.</option>
+                                    <option value="2">3 - Actor suggests a few options to team member.</option>
+                                    <option value="2">2 - Actor suggests a complete set of options to team member.</option>
+                                    <option value="1">1 - Actor offers no assistance to team member and acts autonomously.</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <div><b>Who triggers this level of supervision (from whom the arrow leads)?</b>
+                            <div>
+                                <input type="radio" id="supervision_starter" name="supervision_starter" value="human" checked="direct">
+                                <label for="direct">Human</label><br>
+                                <input type="radio" id="supervision_starter" name="supervision_starter" value="agent">
+                                <label for="indirect">Agent</label>
+                            </div>
+                        </div>
+                        <hr>
+                        <div><b>Who transfers the knowledge to another team member?</b>
+                            <div>
+                                <input type="radio" id="teacher" name="teacher" value="none" checked="none">
+                                <label for="none">N/A</label><br>
+                                <input type="radio" id="teacher" name="teacher" value="human">
+                                <label for="human">Human</label><br>                     
+                                <input type="radio" id="teacher" name="teacher" value="agent">
+                                <label for="agent">Agent</label>
+                            </div>
+                        </div>
+                        <hr>
+                        <div><b>Who raises a question to clarify a situation to another team member?</b>
+                            <div>
+                                <input type="radio" id="question" name="question" value="none" checked="none">
+                                <label for="none">N/A</label><br>
+                                <input type="radio" id="question" name="question" value="human">
+                                <label for="human">Human</label><br>                     
+                                <input type="radio" id="question" name="question" value="agent">
+                                <label for="agent">Agent</label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div><b>Who provides a feedback regarding the performed work to another team member?</b>
+                            <div>
+                                <input type="radio" id="feedback" name="feedback" value="none" checked="none">
+                                <label for="none">N/A</label><br>
+                                <input type="radio" id="feedback" name="feedback" value="human">
+                                <label for="human">Human</label><br>                      
+                                <input type="radio" id="feedback" name="feedback" value="agent">
+                                <label for="agent">Agent</label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div><b>Does the human use the hand gestures for teleoperation?</b>
+                            <div>
+                                <input type="radio" id="hand_gestures" name="hand_gestures" value="no" checked="no">
+                                <label for="no">No</label><br>                    
+                                <input type="radio" id="hand_gestures" name="hand_gestures" value="yes">
+                                <label for="yes">Yes</label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div><b>Who hands a physical object over to another team member?</b>
+                            <div>
+                                <input type="radio" id="handover" name="handover" value="none" checked="none">
+                                <label for="none">N/A</label><br>
+                                <input type="radio" id="handover" name="handover" value="human">
+                                <label for="human">Human</label><br>                       
+                                <input type="radio" id="handover" name="handover" value="agent">
+                                <label for="agent">Agent</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <input type="button" class="filter_cancel filter_buttons" value="Cancel">
+                            <input type="button" class="filter_save filter_buttons" value="Generate">
+                        </div>
+                </div>
+            </div>
+            <div class="right_container">
+                <svg id="svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="border:2px solid grey;" viewBox="0 0 580 350">
+                </svg>
+                <button id="downloadSVG" class="filter_order_buttons">Download .svg</button>
+            </div>
+            
+        </div>
+
+
+    </body>
+</html>

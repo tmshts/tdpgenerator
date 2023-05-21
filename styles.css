@@ -1,0 +1,75 @@
+.input {
+    border-radius: 5px;
+    width: 20px;
+  }
+
+body {
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+.filter_buttons {
+  margin-top: 5px;
+  padding: 4px;
+  color: white;
+  background-color: blueviolet;
+  border-radius: 10px;
+  font-size: small;
+  width: 70px;
+}
+
+.filter_order_buttons {
+  padding: 4px;
+  color: white;
+  background-color: blueviolet;
+  border-radius: 10px;
+  font-size: small;
+  width: 120px;
+  margin-top: 2px;
+}
+
+.inputfield_number {
+  width: 120px;
+  border-radius: 10px;
+  padding-left: 5px;
+}
+
+.inputfield_text {
+  border-radius: 10px;
+  padding-left: 5px;
+  width: 250px;
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.flex-container > div {
+  width: 50%;
+  text-align: left;
+}
+
+.right_container {
+  width: 50%;
+  height: 370px;
+  margin: 20px;
+  text-align: center;
+}
+
+#svg {
+  width: 85%;
+  height: 100%;
+  border: grey solid 3px;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
