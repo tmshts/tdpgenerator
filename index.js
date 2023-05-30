@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
         filter.addEventListener('click', () => handle_filter());
         }
 
+    const error_message = document.querySelector('#error_message');
+
     const downloadSVG = document.querySelector('#downloadSVG');
     downloadSVG.addEventListener('click', downloadSVGA);
 
@@ -39,12 +41,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.querySelector('.filter_save').addEventListener('click', () => {
 
-
             let svgns = "http://www.w3.org/2000/svg";
             let svg = document.querySelector('#svg');
 
             // After clicking on generate svg canvas becomes empty
             svg.innerHTML = ""
+
+            // Error message is deleted
+            error_message.innerHTML = ''
+
 
             // Create Human Body
             // Right Part Body
@@ -166,6 +171,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 human_hand_right.setAttributeNS(null, 'style', 'fill: none; stroke: black; stroke-width: 2px;' );
                 human_hand_left.setAttribute("points", "132,147 90,180 60,150");
                 human_hand_left.setAttributeNS(null, 'style', 'fill: none; stroke: black; stroke-width: 2px;' );
+            }
+            
+            
+            if ((human_physical_work_function("direct") || human_physical_work_function("indirect")) && (joint_physical_work_function("direct") || joint_physical_work_function("indirect"))) {
+                error_message.innerHTML = 'Human can not perform physical work individually and share physical work with the Agent at the same time. '
+            }
+
+            if (((human_physical_work_function("direct") || human_physical_work_function("indirect")) || (joint_physical_work_function("direct") || joint_physical_work_function("indirect"))) && hand_gestures_function("yes")) {
+                error_message.innerHTML = 'Human can not perform physical work individually or share physical work with the Agent and using hands for teleoperation at the same time. '
             }
             svg.appendChild(human_hand_right);
             svg.appendChild(human_hand_left);
@@ -298,6 +312,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 agent_physical_work.setAttributeNS(null, 'style', 'fill: lightblue; stroke: black; stroke-width: 2px;' );
                 svg.appendChild(agent_physical_work);
             }
+
+
+            if ((agent_physical_work_function("direct") || agent_physical_work_function("indirect")) && (joint_physical_work_function("direct") || joint_physical_work_function("indirect"))) {
+                error_message.innerHTML += '<br> Agent can not perform physical work individually and share physical work with the Human at the same time.'
+            }
+
 
             // Joint Physical Work
             let joint_physical_work = document.createElementNS(svgns, "rect");
@@ -530,7 +550,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 arrow_apex.setAttribute("points", "238,53 230,60 238,66");
                 arrow_apex.setAttributeNS(null, 'style', 'fill: black;' );
                 svg.appendChild(arrow_apex);
-        }
+            }
+
+            if ((handover_function("human") || handover_function("agent")) && (human_physical_work_function("none") && agent_physical_work_function("none"))) {
+                error_message.innerHTML += 'Handover of a physical object requires physical work of the human and the agent.'
+            }
+
+            if ((handover_function("human") || handover_function("agent")) && (human_physical_work_function("none") && (agent_physical_work_function("direct") || agent_physical_work_function("indirect")))) {
+                error_message.innerHTML += 'Handover of a physical object requires physical work of the human and the agent.'
+            }
+
+            if ((handover_function("human") || handover_function("agent")) && (agent_physical_work_function("none") && (human_physical_work_function("direct") || human_physical_work_function("indirect")))) {
+                error_message.innerHTML += 'Handover of a physical object requires physical work of the human and the agent.'
+            }
             
             // jQuery for modalities
             let modalities = $('#modalities').val();
