@@ -1,4 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    // related_work_id
+    const related_work_id = document.querySelector('#related_work_id');
+    if (related_work_id){
+        related_work_id.addEventListener('click', () => handle_related_work());
+        }
+
+    // home_id
+    const home_id = document.querySelector('#home_id');
+    if (home_id){
+        home_id.addEventListener('click', () => handle_home());
+    }
+
     // Filter
     const filter = document.querySelector('#select_dimensions');
     if (filter){
@@ -22,6 +35,36 @@ document.addEventListener('DOMContentLoaded', function() {
         a.download = 'generated_tdp.svg';
         a.href = 'data:image/svg+xml;base64,' + base64doc;
         a.dispatchEvent(even);
+    }
+
+    function handle_home() {
+        const home_id = document.querySelector('#home_id');
+        home_id.classList.add("active");
+        const related_work_id = document.querySelector('#related_work_id');
+        related_work_id.classList.remove("active");
+
+        // Show dimensions and picture
+        const home = document.querySelector('.home');
+        home.style.display = 'block';
+
+        // Hide Related Works
+        const related_works = document.querySelector('.related_works');
+        related_works.style.display = 'none';
+    }
+
+    function handle_related_work() {
+        const related_work_id = document.querySelector('#related_work_id');
+        related_work_id.classList.add("active");
+        const home_id = document.querySelector('#home_id');
+        home_id.classList.remove("active");
+     
+        // Show Related Works
+        const related_works = document.querySelector('.related_works');
+        related_works.style.display = 'block';
+
+        // Hide dimensions and picture
+        const home = document.querySelector('.home');
+        home.style.display = 'none';
     }
     
     function handle_filter() {
