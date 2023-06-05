@@ -607,9 +607,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 error_message.innerHTML += 'Handover of a physical object requires physical work of the human and the agent.'
             }
             
-            // jQuery for modalities
-            let modalities = $('#modalities').val();
-
+            // jQuery for modalities           
+            let modalities = $('.communication_modalities:checked').map(function () {
+                return this.value;
+                }).get();
+            //console.log(modalities);
+            
             for (let i = 0; i < modalities.length; i++) {
                 //console.log(modalities[i])
 
