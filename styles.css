@@ -69,23 +69,25 @@ h3 {
 }
 
 /* Style the links inside the navigation bar */
-.navbar a {
+.navbar button {
   float: left;
   display: block;
   color: black;
+  background-color: white;
   text-align: center;
   padding: 10px 10px;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 12px;
   border-radius: 10px;
+  margin-right: 2px;
 }
 
-.navbar a:hover {
+.navbar button:hover {
   background-color: blueviolet;
   color: white;
 }
 
-.navbar a.active {
+.navbar button.active {
   background-color: blueviolet;
   color: white;
 }
