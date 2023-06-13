@@ -115,10 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.querySelector('.filter_cancel').addEventListener('click', () => {
     
-            // Show Select Dimensions Button
-            document.querySelector('#select_dimensions').style.display = 'block';
-            // Hide Filter Div
-            document.querySelector('#filter_div').style.display = 'none'; 
+        // Show Select Dimensions Button
+        document.querySelector('#select_dimensions').style.display = 'block';
+        // Hide Filter Div
+        document.querySelector('#filter_div').style.display = 'none'; 
         });
 
         document.querySelector('.filter_save').addEventListener('click', () => {
