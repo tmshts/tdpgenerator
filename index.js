@@ -6,6 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
         related_work_id.addEventListener('click', () => handle_related_work());
         }
 
+    // use_case_id
+    const use_case_id = document.querySelector('#use_case_id');
+    if (use_case_id){
+        use_case_id.addEventListener('click', () => handle_use_case());
+        }
+
     // home_id
     const home_id = document.querySelector('#home_id');
     if (home_id){
@@ -42,6 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
         home_id.classList.add("active");
         const related_work_id = document.querySelector('#related_work_id');
         related_work_id.classList.remove("active");
+        const use_case_id = document.querySelector('#use_case_id');
+        use_case_id.classList.remove("active");
 
         // Show dimensions and picture
         const home = document.querySelector('.home');
@@ -50,6 +58,31 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hide Related Works
         const related_works = document.querySelector('.related_works');
         related_works.style.display = 'none';
+
+        // Hide Related Works
+        const use_case = document.querySelector('.use_case');
+        use_case.style.display = 'none';
+    }
+
+    function handle_use_case() {
+        const use_case_id = document.querySelector('#use_case_id');
+        use_case_id.classList.add("active");
+        const related_work_id = document.querySelector('#related_work_id');
+        related_work_id.classList.remove("active");
+        const home_id = document.querySelector('#home_id');
+        home_id.classList.remove("active");
+
+        // Show use case
+        const use_case = document.querySelector('.use_case');
+        use_case.style.display = 'block';
+
+        // Hide Related Works
+        const related_works = document.querySelector('.related_works');
+        related_works.style.display = 'none';
+
+        // Hide Home
+        const home = document.querySelector('.home');
+        home.style.display = 'none';
     }
 
     function handle_related_work() {
@@ -57,6 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
         related_work_id.classList.add("active");
         const home_id = document.querySelector('#home_id');
         home_id.classList.remove("active");
+        const use_case_id = document.querySelector('#use_case_id');
+        use_case_id.classList.remove("active");
      
         // Show Related Works
         const related_works = document.querySelector('.related_works');
@@ -65,6 +100,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hide dimensions and picture
         const home = document.querySelector('.home');
         home.style.display = 'none';
+
+        // Hide use case
+        const use_case = document.querySelector('.use_case');
+        use_case.style.display = 'none';
     }
     
     function handle_filter() {
