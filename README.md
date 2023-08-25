@@ -1,7 +1,9 @@
 # tdpgenerator
 
-This website is created for the purpose of a master thesis at the Friedrich-Alexander-Universität Erlangen-Nürnberg (FAU). The name of the thesis is Developing a Modelling Language for Team Design Patterns to Represent Human-Agent Collaboration.
+Some refactoring from https://tmshts.github.io/tdpgenerator.
 
-**Purpose:** Provide a user-agnostic modelling language to describe Human-Agent Collaboration to facilitate the comprehension for diverse user groups.
 
-Here is the link for the website: https://tmshts.github.io/tdpgenerator.
+# TODOS
+
+* arrow inversion destroys mortarboard
+* current positioning references left actor. Would be better to have interal referencing and then an offset to the left actor
