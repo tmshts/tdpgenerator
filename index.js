@@ -1,4 +1,4 @@
-import {Human, Machine, PhysicalWork, Location, Supervision, Transfer, Modality} from './constructs.js'
+import {Human, Agent, PhysicalWork, Location, Supervision, Transfer, Modality} from './constructs.js'
 import {check_incompatibilities} from './error_handler.js';
 import {getRadioValue, getCheckValue} from './etc.js';
 
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let humanPhy = getRadioValue('#human_physical_work');
             let agentPhy = getRadioValue('#agent_physical_work');
             let humanCogni = getRadioValue("#human_cognitive_work");
-            let machineCogni = getRadioValue("#agent_cognitive_work");
+            let agentCogni = getRadioValue("#agent_cognitive_work");
             let gestures = getRadioValue("#hand_gestures");
             let handover = getRadioValue("#handover");
             let teacher  = getRadioValue("#teacher");
@@ -141,13 +141,12 @@ document.addEventListener('DOMContentLoaded', function() {
             let feedback = getRadioValue("#feedback");
 
             // making sure that arms are lifted in case of any physical work
-            let humanArm    = (jointWork != 'none' || humanPhy != 'none') ? 'physical' :  'none';
-            let machineArm  = (jointWork != 'none' || agentPhy != 'none') ? 'physical' :  'none';
+            let humanEngagement    = (gestures == 'yes') ? 'gesture' : (jointWork != 'none' || humanPhy != 'none') ? 'physical' :  'none';
+            let agentArm  = (jointWork != 'none' || agentPhy != 'none') ? 'physical' :  'none';
 
             check_incompatibilities(humanPhy, jointWork, gestures, agentPhy, handover)
             if(error_message.innerHTML.length > 0) {return}
             
-
            
            
             if(error_message.innerHTML.length > 0) {return}
@@ -158,10 +157,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // add actors with cognitive Work
             const left = {'x': 150, 'y': 141}
             const right = {'x':405, 'y': 141}
-            const human = new Human({'x': left['x'], 'y': left['y']})
-            const machine = new Machine({'x': right['x'], 'y': right['y']})
-            elements.push(...human.create(humanCogni, humanArm))
-            elements.push(...machine.create(machineCogni, machineArm))
+            const human = new Human(left, humanCogni, humanEngagement)
+            const agent = new Agent(right, agentCogni, agentArm)
+            elements.push(...human.create())
+            elements.push(...agent.create())
             
             // add physical work
             let w = 140, h = 40;
@@ -188,15 +187,15 @@ document.addEventListener('DOMContentLoaded', function() {
             /// Add Supervision
             let toLeft = getRadioValue("#supervision_starter") == 'agent';
             let rank = document.getElementById("supervision_level").value - 1; // bc array index starts at 0 
-            const supervision = new Supervision();
-            elements.push(...supervision.create(left, rank, toLeft));
+            const supervision = new Supervision(left);
+            elements.push(...supervision.create(rank, toLeft));
             
             /// Add additional arrows besides supervision
-            const transfer = new Transfer();
+            const transfer = new Transfer(left);
             for(const [i, val] of [handover, teacher, question, feedback].entries()){
                 if(val == 'none') {continue;}
                 let toLeft = (val == 'agent');
-                elements.push(...transfer.create(left,i,toLeft))
+                elements.push(...transfer.create(i,toLeft))
             }
 
             // add modalities

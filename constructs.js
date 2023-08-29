@@ -1,288 +1,193 @@
+import { Instruct} from "./svg_handler.js";
 
-class Construct {
-  constructor(attributes){
-      this.svg = document.createElementNS("http://www.w3.org/2000/svg", attributes['type']);
-      this.att = attributes;
-      if('textContent' in this.att) {
-        this.svg.textContent = this.att['textContent']
-      }
-  }
-  draw() {
-      for (const [key, value] of Object.entries(this.att)) {
-          this.svg.setAttribute(key, value);
-      }
-      return this.svg;
-  }
-}
-
-
-class Path extends Construct{
-  // constructor(startPoint) {
-  //   const att = {
-  //       "type"  : "path",
-  //       "style" : "fill:transparent; stroke: black; stroke-width: 2px;",
-  //   }
-  //   super(att)
-  //   this.x = startPoint['x'];
-  //   this.y = startPoint['y'];
-  // }
-  constructor(startPoint, att) {
-    const basic_att = {
-      "type"  : "path",
-      "style" : "fill:transparent; stroke: black; stroke-width: 2px;",
-    }
-    att = att == null ? basic_att : att
-    super({...basic_att, ...att})
-    this.x =  startPoint['x']
-    this.y = startPoint['y']
-    this.points = []
-    const coord = this.att['d']
-    if(coord == null){return}
-    for (let i = 2; i < coord.length; i = i + 2) {
-        this.points.push({'x': coord[i] + this.x, 'y': coord[i+1] + this.y})
-      }
-      this.x += coord[0] 
-      this.y += coord[1] 
-  }
-  flattenPoints () {
-      const arr = []
-      for (const element of this.points) {
-          arr.push(element['x'])
-          arr.push(element['y'])
-      }
-      return arr
-  }
-  addPath (char) {
-      let c = this.flattenPoints().toString().replace(',', ' ');
-      this.att['d'] = `M ${this.x} ${this.y} ${char} ` + c;
-  }
-}
 
 class Actor {
   constructor(bottomLeftPoint) {
-    this.x = bottomLeftPoint['x'];
-    this.y = bottomLeftPoint['y'];
+    this.point = bottomLeftPoint;
+    this.instructs = [];
+  }
+  create() {
+    return this.instructs;
   }
 }
 
-class Machine extends Actor{
-  constructor(bottomLeftPoint) {
-    super(bottomLeftPoint)
+class Agent extends Actor{
+  constructor(bottomLeftPoint, cogniWork, agentArm) {
+    super(bottomLeftPoint);
+    this.instructs.push(new Instruct(this.point, this.getHead(cogniWork)));
+    this.instructs.push(new Instruct(this.point, this.getBody(cogniWork)));
+    this.drawAgent(cogniWork,agentArm);
   }
-  getHead(x, y, cogniWork){
-    return new Construct({
+  getHead(cogniWork){
+    return {
       'type': 'rect',
-      'x': x - 20,
-      'y': y - 35,
+      'x': -20,
+      'y': -35,
       'width': 40,
       'height': 35,
       'style': "stroke: black; stroke-width: 2px;",
       'fill': cogniWork == 'direct' ? 'blue' : cogniWork == 'indirect' ? 'lightblue' : 'none'
-    })
+    }
   }
-  getBody(x,y, cogniWork){
-    let vfill;
-    if(cogniWork=='direct'){
-      vfill = 'blue';
-    } else if(cogniWork=='indirect'){
-      vfill = 'lightblue';
-    } else vfill = 'none'; 
-
-    return new Construct({
+  getBody(){
+    return {
       "type": "rect",
-      "x": x - 50, 
-      "y": y,
+      "x": -50, 
+      "y": 0,
       "width": 100,
       "height": 110,
       "style": "stroke: black; stroke-width: 2px;",
-      'fill': vfill
-    })
+      'fill': 'none'
+    }
   }
-  create(cogniWork, phyWork) {
-    const x = this.x, y = this.y;
-    return [
-      this.getHead(x,y, cogniWork),
-      this.getBody(x,y),
-      new MachineArm(x,y, false, phyWork),
-      new MachineArm(x,y, true, phyWork)
-    ];
+  getArm(sign, agentArm){
+    const points = [];
+    const p = (agentArm=='physical') ? [40,19,65,19,65,-61] : [40,6,85,49,38,60];
+    let x = p[0]; let y = p[1];
+    for(let i=0; i < p.length; i+=2){
+      points.push(p[i]*sign - x);
+      points.push(p[i+ 1] - y);
+    }
+    return {
+      'type'  : 'polyline',
+      'x'     : x,
+      'y'     : y,
+      'points': points,
+      'style' : 'fill: none; stroke: black; stroke-width: 2px;'
+      }
+    }
+  drawAgent(cogniWork, agentArm) {
+      this.instructs.push(new Instruct(this.point,this.getHead(cogniWork)));
+      this.instructs.push(new Instruct(this.point,this.getBody()));
+      this.instructs.push(new Instruct(this.point,this.getArm(-1, agentArm)));
+      this.instructs.push(new Instruct(this.point,this.getArm( 1, agentArm)));
   }
- 
 }
 
 
 class Human extends Actor{
-  constructor(bottomLeftPoint) {
+  constructor(bottomLeftPoint, cogniWork, engagement) {
     super(bottomLeftPoint)
+    this.drawHuman(cogniWork, engagement);
   }
-  create(cogniWork, phyWork) {
-    const x = this.x, y = this.y;
-    return [
-       new Head({'x': x, 'y': y - 21}, cogniWork),
-       new Neck({'x': x + 8,'y': y - 1},false), 
-       new Neck({'x': x - 8,'y': y - 1}, true), 
-       new Body({'x': x + 33,'y': y + 29}), 
-       new Body({'x': x - 33,'y': y + 29}),
-       new Arm({'x': x + 18, 'y': y + 6}, false, phyWork), // TODO: distingution for left and right for gesture 
-       new Arm({'x': x - 18, 'y': y + 6}, true, phyWork),
-       new Construct({
-          'type'  : 'polyline',
-          'points': `${x - 33}, ${y + 109} ${x + 33},${y + 109}`,
-          'style' : 'fill: none; stroke: black; stroke-width: 2px;'
-      })
-    ];
+  drawHuman(cogniWork, engagement){
+    this.instructs.push(new Instruct(this.point, this.getHead(cogniWork)));
+    for(const sign of [1,-1]) {
+        this.instructs.push(new Instruct(this.point, this.getNeckHalf(sign)));
+        this.instructs.push(new Instruct(this.point, this.getBodyHalf(sign)));
+        this.instructs.push(new Instruct(this.point, this.getArm(sign, engagement)));
+    }
+    this.instructs.push(new Instruct(this.point, this.getBottom()));
   }
-}
-
-class Neck extends Path {
-  constructor(startPoint, isLeft) {
-      super(startPoint);
-      this.sign = isLeft ? -1 : 1;
-      this.points =  [
-          {'x': `${this.x+(12*this.sign)}`, 'y':`${this.y+(5)}`},
-          {'x': `${this.x+(22*this.sign)}`, 'y':`${this.y+(20)}`},
-          {'x': `${this.x+(25*this.sign)}`, 'y':`${this.y+(30)}`}
-      ]
-      this.addPath('C')
-  }
-}
-
-
-
-class Body extends Construct{
-  constructor(startPoint) {
-      const x = startPoint['x'];
-      const y = startPoint['y'];
-      const att = {
-          "type": "line",
-          "x1": x,
-          "y1": y,
-          "x2": x,
-          "y2": y + 80,
-          "style": "fill: none; stroke: black; stroke-width: 2px;"
-      }
-      super(att)
-  }
-}
-
-class Head extends Construct{
-  constructor (centralPoint, cogniWork) {
-    const x = centralPoint['x'];
-    const y = centralPoint['y'];
-    const att = {
+  getHead(cogniWork) {
+    const r = 21;
+    return {
       'type': 'circle',
-      'cx': x,
-      'cy': y,
-      'r' : 21,
+      'x': 0,
+      'y': -r,
+      'r' : r,
       'style': 'stroke: black; stroke-width: 2px;',
       'fill': cogniWork == 'direct' ? 'blue' : 'lightblue' 
     }
-    super(att)
   }
-}
-//     agent_hand_right.setAttribute("points", "395,160 370,160 370,80");
-            //     agent_hand_left.setAttribute("points", "465,160 490,160 490,80");
-class MachineArm extends Construct{
-  constructor(x, y, isLeft, engagement) {
-    const att = {
-      'type'  : 'polyline',
-      'style' : 'fill: none; stroke: black; stroke-width: 2px;'
+  getNeckHalf(sign) {
+      return {
+        'type': 'path',
+        'x': 8*sign, 
+        'y': -1,
+        'd': `c ${12*sign} 5 ${22*sign} 20 ${25*sign} 30`,
+        'style': 'fill:transparent; stroke: black; stroke-width: 2px;'
+      };
     }
-    super(att);
-    this.sign = isLeft ? -1 : 1;
-    if(engagement=='physical') {
-      this.att['points'] = [
-        x+(40*this.sign),y+19, 
-        x+(65*this.sign), y+19, 
-        x+(65*this.sign), y-61
-      ].toString()
-    } else {
-      this.att['points'] = [
-        x+(40*this.sign),y+6, 
-        x+(85*this.sign), y+40, 
-        x+(38*this.sign), y+60
-      ].toString()
+  getBodyHalf(sign) { 
+    return {'type': 'line',
+            'x': 33*sign,
+            'y': 29,
+            'points': [0, 0, 0, 80],
+            'style': "fill: none; stroke: black; stroke-width: 2px;"
     }
   }
-}
-
-class Arm extends Path{
-  constructor(startPoint, isLeft, engagement) {
-    super(startPoint);
-    this.sign = isLeft ? -1 : 1;
+  getArm(sign, engagement){
+    const att = {'style': 'fill:transparent; stroke: black; stroke-width: 2px;'}
     if(engagement=='physical') {
-        this.points =  [
-          {'x': `${this.x+(42*this.sign)}`, 'y':`${this.y-12}`},
-          {'x': `${this.x+(42*this.sign)}`, 'y':`${this.y-47}`},
-          {'x': `${this.x+(42*this.sign)}`, 'y':`${this.y-67}`}
-        ]
+      att['type'] = 'path';
+      att['x'] = 18*sign ;
+      att['y'] = 6 ;
+      att['d'] = `c ${42*sign} -12 ${42*sign} -47 ${42*sign} -67`;
     } else if(engagement=='gesture'){
-        this.points =  [
-          {'x': `${this.x+(18*this.sign)}`, 'y':`${this.y + 6}`},
-          {'x': `${this.x+(42*this.sign)}`, 'y':`${this.y + 33}`},
-          {'x': `${this.x+(72*this.sign)}`, 'y':`${this.y + 9}`},
-        ]
+      att['type'] = 'polyline';
+      att['x'] = 18*sign ;
+      att['y'] =  6;
+      att['points'] = [0, 0, 42*sign, 33, 72*sign, 3]
     } else {
-        this.points =  [
-          {'x': `${this.x+(18*this.sign)}`, 'y':`${this.y + 6}`},
-          {'x': `${this.x+(75*this.sign)}`, 'y':`${this.y + 28}`},
-          {'x': `${this.x+(16*this.sign)}`, 'y':`${this.y + 43}`},
-        ]
+      att['type'] = 'polyline'
+      att['x'] = 18*sign ;
+      att['y'] =  6;
+      att['points'] = [0, 0, 52*sign, 28, 16*sign, 43];
     }
-    this.addPath('C');
+    return att
+  }
+  getBottom() {
+    return {
+          'type'  : 'polyline',
+          'x': -33,
+          'y': 109,
+          'points': [0, 0, 66, 0],
+          'style' : 'fill: none; stroke: black; stroke-width: 2px;'
+      }
   }
 }
 
-class PhysicalWork extends Construct{
+class PhysicalWork {
   constructor(bottomLeftPoint, width, height, type){
     const att = {
       'type'  : 'rect', 
-      'x'     : bottomLeftPoint['x'], 
-      'y'     : bottomLeftPoint['y'], 
+      'x'     : 0, 
+      'y'     : 0, 
       'width' : width, // 140
       'height': height, // 40
       'style' : 'stroke: black; stroke-width: 2px;',
       'fill'  : type =='direct' ? 'blue' : 'lightblue'
     }
-    super(att)
+    this.instruct = new Instruct(bottomLeftPoint, att);
+  }
+  draw() {
+    return this.instruct.draw()
   }
 }
 
-class Location extends Construct{
+class Location {
   constructor(bottomLeftPoint, width, height){
     const att = {
       'type'  : 'rect', 
-      'x'     : bottomLeftPoint['x'], 
-      'y'     : bottomLeftPoint['y'], 
+      'x'     : 0, 
+      'y'     : 0, 
       'width' : width, // 400
       'height': height, // 10
       'style' : 'stroke: black; stroke-width: 2px;',
       'fill'  : 'grey'
     }
-    super(att)
+    this.instruct = new Instruct(bottomLeftPoint, att);
+    
+  }
+  draw() {
+    return this.instruct.draw()
   }
 }
 
 class Arrow {
-  constructor(arrowList) {
-    this.arrows = arrowList
+  constructor(leftPoint, arrowList) {
+    this.leftPoint = leftPoint;
+    this.arrows = arrowList;
   }
-  inverseArrows(points, min, max){
-    let localMin = 1000 ;
+  inverseArrowHead(points) {
+    let width = -1000;
     for (let i = 0; i < points.length; i = i + 2) {
       // only consider x values
-      localMin = (points[i] < localMin) ?  points[i] : localMin;
-      min = (localMin < min) ?  localMin : min;
-      max = (points[i] > max) ?  points[i] : max;
+      width = (width < points[i]) ? points[i] : width;
+      points[i] *= -1;
     }
-    const avg = Math.floor((max + min)/2);
-    const shift = Math.floor(max - localMin);
-    let diff = 0;
-    for (let i = 0; i <  points.length; i = i + 2) {
-      diff =  points[i] - avg;
-      points[i] =  points[i] - (2 * diff)
-    }
-    return [points, shift] 
+    return [points, width];
   }
   moveRect(shift) {
     for (const att of this.arrow) {
@@ -291,51 +196,21 @@ class Arrow {
       }
     }
   }
-  alignPoints (x,y, att) {
-    for (const [index, value] of att['points'].entries()) {
-      if(index % 2 == 0) {
-        att['points'][index] += x
-      } else {
-        att['points'][index] += y;
-      }
-    }
-    return att['points'];
-  }
-  create(startPoint, index, toLeft) {
-    const x = startPoint['x'], y = startPoint['y'];
+  create(index, toLeft) {
     const arr = [];
-    let min = 1000, max = -1000;
+    let min = 0;
     let shift = 0;
     this.arrow = this.arrows.at(index);
     for (const att of this.arrow) {
-      if (att['type'] == 'rect'){
-        att['x'] += x ;
-        att['y'] += y ;
+      if (['rect', 'path'].includes(att['type'])){
         min = att['x'];
-        max = att['x'] + att['width'];
-      } else if(att['type'] == 'polyline'){
-        att['points'] = this.alignPoints(x,y, att);
-        if(toLeft){
-          [att['points'], shift] = this.inverseArrows(att['points'], min, max)
-        }
-        att['points'] = att['points'].toString()
-      } else if(att['type'] == 'text') {
-        att['x'] += x ;
-        att['y'] += y ;
-      }
-      
-      if(toLeft){
-        this.moveRect(shift);
-      }
-      if(att['type'] == 'path'){
-        let path = new Path(startPoint, att)
-        path.addPath('l')
-        min = path.x;
-        arr.push(path)
-      } else {
-        arr.push(new Construct(att));
-      }
-      
+      } else if(att['type'] == 'polyline' && toLeft){
+          [att['points'], shift] = this.inverseArrowHead(att['points']);
+          min = (min > 0) ? min : att['x'];
+          att['x'] = min + shift;
+          this.moveRect(shift);
+      } 
+      arr.push(new Instruct(this.leftPoint, att));
     }
     return arr;
   }
@@ -343,141 +218,117 @@ class Arrow {
 
 
 class Supervision extends Arrow{
-  constructor() {
+  constructor(leftPoint) {
     const levels = [
       [], // 1 not used
-      [{'type': 'rect', 'x': 85, 'y': -21, 'width': 80, 'height': 3, 'fill': 'black'}, {'type': 'polyline', 'points': [165, -27, 170, -20, 165, -13], 'fill': 'black'}], // 2
-      [{'type': 'polyline', 'points': [85, -27, 165, -27, 165,-34, 190,-21, 165,-8, 165,-15, 85,-15, 85,-27], 'style': 'fill: none; stroke: black; stroke-width: 2px;'}], // 3
-      [{'type': 'polyline', 'points': [85, -26, 95, -19, 85, -12, 165, -12, 180, -19, 165, -26, 85, -26], 'style': 'fill: black; stroke: black; stroke-width: 2px;'}], // 4
-      [{'type': 'rect', 'x': 85, 'y': -22, 'width': 80, 'height': 16, 'fill': 'black'}, {'type': 'polyline', 'points':[165,-32, 190, -14, 165, 3], 'fill': 'black'}], //5
-    ]
-    super(levels);
+      [{'type': 'rect', 'x': 85, 'y': -21, 'width': 80, 'height': 3, 'fill': 'black'}, {'type': 'polyline', 'x': 165, 'y': -27, 'points': [0, 0, 5, 7, 0, 14], 'fill': 'black'}], // 2
+      [{'type': 'polyline', 'x': 85, 'y': -27, 'points': [0, 0, 80, 0, 80, -7, 105, 6, 80, 19, 80, 12, 0, 12, 0, 0], 'style': 'fill: none; stroke: black; stroke-width: 2px;'}], // 3
+      [{'type': 'polyline', 'x': 85, 'y': -26, 'points': [0, 0, 10, 7, 0, 14, 80, 14, 95, 7, 80, 0, 0, 0], 'style': 'fill: black; stroke: black; stroke-width: 2px;'}], // 4
+      [{'type': 'rect', 'x': 85, 'y': -22, 'width': 80, 'height': 16, 'fill': 'black'}, {'type': 'polyline', 'x': 165, 'y': -32, 'points':[0, 0, 25, 18, 0, 35], 'fill': 'black'}], //5
+    ];
+    super(leftPoint, levels)
   }
 }
 
 class Transfer extends Arrow{
   // TODO add missing annotation letters
-  constructor() {
+  constructor(leftPoint) {
     const transfers = [
       [
-        //handover ,
-        {'type': 'path', 'd': [80, -81, -40, -141],  'stroke-dasharray': '10,10'},
-        {'type': 'polyline', 'points':  [190, -88, 198, -81, 190, -75], 'fill': 'black'}
+        //handover , 'd': 'l'
+        {'type': 'path', 'x': 80, 'y': -81,  'd': 'l 110 0',  'stroke-dasharray': '10,10'},
+        {'type': 'polyline', 'x': 190, 'y': -88, 'points':  [0, 0, 8, 7, 0, 13], 'fill': 'black'}
       ],
       [
           // teach
-          {'type': 'path', 'd': [85, 29, -65, -141], 'stroke-dasharray': '10,10'},
-          {'type': 'polyline', 'points': [170, 24, 180 , 29, 170, 34], 'fill': 'black'},
+          {'type': 'path', 'x': 85, 'y': 29, 'd': 'l 85 0', 'stroke-dasharray': '10,10', 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
+          {'type': 'polyline', 'x': 170, 'y': 24, 'points': [0, 0, 10 , 5, 0, 10], 'fill': 'black'},
           // hat
-          {'type': 'polyline', 'points': [117, 9, 132, 4, 147, 9, 132, 14, 117, 9], 'fill': 'black'},
-          {'type': 'polyline', 'points': [124, 12, 132, 15, 141, 12, 141, 20, 132, 22, 122, 20, 122, 11], 'fill': 'black'},
-          {'type': 'line', 'x1': 268, 'y1': 150, 'x2': 268, 'y2': 155, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'circle', 'cx': 268, 'cy': 156, 'r': 1},
-          {'type': 'polyline', 'points': [118, 14, 120, 21, 116, 21, 118, 14], 'fill': 'black'}
       ],
       [
         //question
-        {'type': 'path', 'd': [85, 64, -65, -141], 'stroke-dasharray': '10,10'},
-        {'type': 'polyline', 'points': [170, 59, 180, 64, 170, 69], 'fill': 'black'},
+        {'type': 'path', 'x': 85, 'y': 64, 'd': 'l 85 0', 'stroke-dasharray': '10,10','style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
+        {'type': 'polyline', 'x': 170, 'y': 59, 'points': [0, 0, 10, 5, 0, 10], 'fill': 'black'},
         // question mark
         {'type': 'text', 'textContent': '?', 'x': 127, 'y': 57, 'style':'stroke: black; '}
       ],
       [
         //feedback
-        {'type': 'path', 'd': [85, 99, -65, -141], 'stroke-dasharray': '10,10'},
-        {'type': 'polyline', 'points': [170, 94, 180, 99, 170, 104], 'fill': 'black'},
+        {'type': 'path', 'x': 85, 'y': 99, 'd': 'l 85 0', 'stroke-dasharray': '10,10', 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
+        {'type': 'polyline', 'x': 170, 'y': 94, 'points': [0, 0, 10, 5, 0, 10], 'fill': 'black'},
         // F char
         {'type': 'text', 'textContent': 'F', 'x': 127, 'y': 92, 'style': 'stroke: black;'}
       ]
-    ]
-    super(transfers);
+    ];
+    super(leftPoint, transfers);
+    this.hat = [ 
+      {'type': 'polyline', 'x': 117, 'y': 9, 'points': [0, 0, 15, -5, 30, 0, 15, 5, 0, 0], 'fill': 'black'},
+      {'type': 'polyline', 'x': 124, 'y': 12, 'points': [0, 0, 8, 3, 17, 0, 17, 8, 8, 10, -2, 8, -2, -1], 'fill': 'black'},
+      {'type': 'line', 'x': 268, 'y': 150, 'points': [0, 0, 0, 5], 'style': 'stroke: black; stroke-width: 1px;'},
+      {'type': 'circle', 'x': 268, 'y': 156, 'r': 1},
+      {'type': 'polyline', 'x': 118, 'y': 14, 'points': [0, 0, 2, 7, -2, 7, 0, 0], 'fill': 'black'}
+    ];
   }
-
+  create(index, toLeft) {
+    const arr = super.create(index, toLeft);
+    if(index == 1) {
+      for (const att of this.hat) {
+        arr.push(new Instruct(this.leftPoint, att));
+      }
+    }
+    return arr;
+  }
 }
  
 
-
-
 class Modality {
   constructor(leftPoint, rightPoint) {
-    this.dist = rightPoint['x'] - leftPoint['x']
-    this.x = leftPoint['x']
-    this.y = leftPoint['y']
-    
+    this.dist = rightPoint['x'] - leftPoint['x'];
+    this.x = leftPoint['x'];
+    this.y = leftPoint['y'];
+    this.leftPoint = leftPoint;
     this.modes = {
       // q behavior
       'visual': [
-          {'type': 'circle', 'cx': 130, 'cy': 174, 'r': 5},
-          {'type': 'circle', 'cx': 130, 'cy': 174, 'r': 10, 'style': 'fill: none; stroke: black; stroke-width: 2px;'},
-          {'type': 'path', 'd': [105, 174, -125, -161, -100, -141], 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
-          {'type': 'path', 'd': [105, 174, -125, -121, -100, -141], 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'}
+          {'type': 'circle', 'x': 130, 'y': 174, 'r': 5},
+          {'type': 'circle', 'x': 130, 'y': 174, 'r': 10, 'style': 'fill: none; stroke: black; stroke-width: 2px;'},
+          {'type': 'path', 'x': 105, 'y': 174, 'd': 'q 25 -20 50 0', 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
+          {'type': 'path', 'x': 105, 'y': 174, 'd':  'q 25  20 50 0', 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'}
       ],
       'haptic': [
-          {'type': 'polyline', 'points': [55, 169, 55, 187, 57, 189, 57, 202], 'style': 'fill: none; stroke: black; stroke-width: 1px;'},
-          {'type': 'line', 'x1': 60, 'y1': 179, 'x2': 60, 'y2': 169, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'path', 'd': [55, 169, -147, -148, -145, -141] , 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-          {'type': 'line', 'x1': 60, 'y1': 179, 'x2': 60, 'y2': 164, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'line', 'x1': 65, 'y1': 179, 'x2': 65, 'y2': 164, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'path', 'd': [60, 164, -147, -148, -145, -141], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-          {'type': 'line', 'x1': 65, 'y1': 179, 'x2': 65, 'y2': 159, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'line', 'x1': 70, 'y1': 179, 'x2': 70, 'y2': 159, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'path', 'd': [65, -159, -147, -148, -145, -141], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-          {'type': 'line', 'x1': 70, 'y1': 179, 'x2': 70, 'y2': 154, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'line', 'x1': 75, 'y1': 184, 'x2': 75, 'y2': 164, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'path', 'd': [70, 164, -147, -148, -145, -141], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-          {'type': 'line', 'x1': 75, 'y1': 184, 'x2': 78, 'y2': 174, 'style': 'stroke: black; stroke-width: 1px;'},
-          {'type': 'path', 'd': [78, 174, -145, -148, -146, -144], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-          {'type': 'polyline', 'points': [82, 176, 78, 191, 70, 197, 70, 202], 'style': 'fill: none; stroke: black; stroke-width: 1px;'}
+          {'type': 'polyline', 'x': 55, 'y': 169, 'points': [0, 0, 0, 18, 2, 20, 2, 33], 'style': 'fill: none; stroke: black; stroke-width: 1px;'},
+          {'type': 'path', 'x': 55, 'y': 169, 'd':  'q 3 -7 5 0' , 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+          {'type': 'line', 'x': 60, 'y': 179, 'points': [0, 0, 0, -15], 'style': 'stroke: black; stroke-width: 1px;'},
+          {'type': 'line', 'x': 65, 'y': 179, 'points': [0, 0, 0, -20], 'style': 'stroke: black; stroke-width: 1px;'},
+          {'type': 'path', 'x': 60, 'y': 164, 'd': 'q 3 -7 5 0', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+          {'type': 'line', 'x': 70, 'y': 179, 'points': [0, 0, 0, -20], 'style': 'stroke: black; stroke-width: 1px;'},
+          {'type': 'path', 'x': 65, 'y': 159, 'd': 'q 3 -7 5 0', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+          {'type': 'line', 'x': 70, 'y': 179, 'points': [0, 0, 0, -20], 'style': 'stroke: black; stroke-width: 1px;'},
+          {'type': 'line', 'x': 75, 'y': 184, 'points': [0, 0, 0, -20], 'style': 'stroke: black; stroke-width: 1px;'},
+          {'type': 'path', 'x': 70, 'y': 164,  'd': 'q 3 -7 5 0', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+          {'type': 'line', 'x': 75, 'y': 184, 'points': [0, 0, 3, -10], 'style': 'stroke: black; stroke-width: 1px;'},
+          {'type': 'path', 'x': 78, 'y': 174, 'd': 'q 5 -7 4 3', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+          {'type': 'polyline', 'x': 82, 'y': 176, 'points': [0, 0, -4, 15, -12, 23, -12, 26], 'style': 'fill: none; stroke: black; stroke-width: 1px;'}
       ],
       'aural': [
-            {'type': 'path', 'd': [180, 174, -140, -156, -130, -141], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-            {'type': 'line', 'x1': 180, 'y1': 174, 'x2': 185, 'y2': 180, 'style': 'stroke: black; stroke-width: 1px;'},
-            {'type': 'polyline', 'points': [200, 174, 200, 179, 192, 184], 'style': 'fill: none; stroke: black; stroke-width: 1px;'},
-            {'type': 'path', 'd': [180, 184, -145, -126, -138, -141], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-            //{'type': 'path', 'd': [180, 174, -140, -167 -124 -141], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-            {'type': 'path', 'd': [173, 174, -130, -177, -112, -141], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
-            {'type': 'polyline', 'points': [211, 174, 207, 179, 202, 184], 'style': 'fill: none; stroke: black; stroke-width: 1px;'},
-            {'type': 'path', 'd': [180, 194, -132, -131, -128, -151], 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'}
+            {'type': 'path', 'x': 180, 'y': 174, 'd': 'q 10 -15, 20, 0', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+            {'type': 'line', 'x': 180, 'y': 174, 'points': [0,0, 5, 6], 'style': 'stroke: black; stroke-width: 1px;'},
+            {'type': 'polyline', 'x': 200, 'y': 174, 'points': [0, 0, 0, 5, -8, 10], 'style': 'fill: none; stroke: black; stroke-width: 1px;'},
+            {'type': 'path', 'x': 180, 'y': 184, 'd': 'q 5 15 12 0', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+            {'type': 'path', 'x': 180, 'y': 174, 'd': 'q 10 -26 26 0', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+            {'type': 'path', 'x': 173, 'y': 174, 'd': 'q 20 -36, 38, 0', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'},
+            {'type': 'polyline', 'x': 211, 'y': 174, 'points': [0, 0, -4, 5, -9, 10], 'style': 'fill: none; stroke: black; stroke-width: 1px;'},
+            {'type': 'path', 'x': 180, 'y': 194, 'd': 'q 18, 10, 22, -10', 'style': 'fill:transparent; stroke: black; stroke-width: 1px;'}
       ],
       
 
     }
   }
-  alignPoints (x,y, att) {
-    for (const [index, value] of att['points'].entries()) {
-      if(index % 2 == 0) {
-        att['points'][index] += x
-      } else {
-        att['points'][index] += y;
-      }
-    }
-    return att['points'];
-  }
   create(modes) {
       const arr = [];
-  
       for(const mode of modes) {
         for(const att of this.modes[mode]) {
-          if(att['type'] == 'path'){
-            let path = new Path({'x': this.x, 'y': this.y}, att);
-            path.addPath('q');
-            arr.push(path)
-          } else if (att['type'] == 'circle'){
-            att['cx'] += this.x;
-            att['cy'] += this.y ;
-            arr.push(new Construct(att))
-          } else if (att['type'] == 'line'){
-            att['x1'] += this.x;
-            att['x2'] += this.x;
-            att['y1'] += this.y;
-            att['y2'] += this.y;
-            arr.push(new Construct(att))
-          }
-          else if (att['type'] == 'polyline'){
-            att['points'] = this.alignPoints(this.x,this.y, att);
-            att['points'] = att['points'].toString();
-            arr.push(new Construct(att))
-          }
+          arr.push(new Instruct(this.leftPoint, att))
         }
       }
       return arr
@@ -486,4 +337,4 @@ class Modality {
 
 
 
-export {Construct, Human, Machine, PhysicalWork, Location, Supervision, Modality, Transfer};
+export {Human, Agent, PhysicalWork, Location, Supervision, Modality, Transfer};
