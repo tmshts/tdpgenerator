@@ -220,11 +220,11 @@ class Arrow {
 class Supervision extends Arrow{
   constructor(leftPoint) {
     const levels = [
-      [], // 1 not used
-      [{'type': 'rect', 'x': 85, 'y': -21, 'width': 80, 'height': 3, 'fill': 'black'}, {'type': 'polyline', 'x': 165, 'y': -27, 'points': [0, 0, 5, 7, 0, 14], 'fill': 'black'}], // 2
-      [{'type': 'polyline', 'x': 85, 'y': -27, 'points': [0, 0, 80, 0, 80, -7, 105, 6, 80, 19, 80, 12, 0, 12, 0, 0], 'style': 'fill: none; stroke: black; stroke-width: 2px;'}], // 3
-      [{'type': 'polyline', 'x': 85, 'y': -26, 'points': [0, 0, 10, 7, 0, 14, 80, 14, 95, 7, 80, 0, 0, 0], 'style': 'fill: black; stroke: black; stroke-width: 2px;'}], // 4
-      [{'type': 'rect', 'x': 85, 'y': -22, 'width': 80, 'height': 16, 'fill': 'black'}, {'type': 'polyline', 'x': 165, 'y': -32, 'points':[0, 0, 25, 18, 0, 35], 'fill': 'black'}], //5
+      [], // no arrow for level 1
+      [{'type': 'rect', 'x': 80, 'y': -20, 'width': 90, 'height': 3, 'fill': 'black'}, {'type': 'polyline', 'x': 170, 'y': -27, 'points': [0, 0, 5, 7, 0, 14], 'fill': 'black'}], // 2
+      [{'type': 'polyline', 'x': 80, 'y': -27, 'points': [0, 0, 80, 0, 80, -7, 105, 6, 80, 19, 80, 12, 0, 12, 0, 0], 'style': 'fill: none; stroke: black; stroke-width: 2px;'}], // 3
+      [{'type': 'polyline', 'x': 80, 'y': -26, 'points': [0, 0, 10, 7, 0, 14, 80, 14, 95, 7, 80, 0, 0, 0], 'style': 'fill: black; stroke: black; stroke-width: 2px;'}], // 4
+      [{'type': 'rect', 'x': 80, 'y': -22, 'width': 70, 'height': 16, 'fill': 'black'}, {'type': 'polyline', 'x': 150, 'y': -32, 'points':[0, 0, 25, 18, 0, 35], 'fill': 'black'}], //5
     ];
     super(leftPoint, levels)
   }
@@ -236,37 +236,37 @@ class Transfer extends Arrow{
     const transfers = [
       [
         //handover , 'd': 'l'
-        {'type': 'path', 'x': 80, 'y': -81,  'd': 'l 110 0',  'stroke-dasharray': '10,10'},
-        {'type': 'polyline', 'x': 190, 'y': -88, 'points':  [0, 0, 8, 7, 0, 13], 'fill': 'black'}
+        {'type': 'path', 'x': 80, 'y': -81,  'd': 'l 85 0',  'stroke-dasharray': '10,10','style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
+        {'type': 'polyline', 'x': 165, 'y': -88, 'points':  [0, 0, 8, 7, 0, 13], 'fill': 'black'}
       ],
       [
-          // teach
-          {'type': 'path', 'x': 85, 'y': 29, 'd': 'l 85 0', 'stroke-dasharray': '10,10', 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
-          {'type': 'polyline', 'x': 170, 'y': 24, 'points': [0, 0, 10 , 5, 0, 10], 'fill': 'black'},
-          // hat
+        // teach
+        {'type': 'path', 'x': 80, 'y': 29, 'd': 'l 85 0', 'stroke-dasharray': '10,10', 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
+        {'type': 'polyline', 'x': 165, 'y': 24, 'points': [0, 0, 10 , 5, 0, 10], 'fill': 'black'},
+        // hat
       ],
       [
         //question
-        {'type': 'path', 'x': 85, 'y': 64, 'd': 'l 85 0', 'stroke-dasharray': '10,10','style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
-        {'type': 'polyline', 'x': 170, 'y': 59, 'points': [0, 0, 10, 5, 0, 10], 'fill': 'black'},
+        {'type': 'path', 'x': 80, 'y': 64, 'd': 'l 85 0', 'stroke-dasharray': '10,10','style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
+        {'type': 'polyline', 'x': 165, 'y': 59, 'points': [0, 0, 10, 5, 0, 10], 'fill': 'black'},
         // question mark
-        {'type': 'text', 'textContent': '?', 'x': 127, 'y': 57, 'style':'stroke: black; '}
+        {'type': 'text', 'textContent': '?', 'x': 124, 'y': 57, 'style':'stroke: black; '}
       ],
       [
         //feedback
-        {'type': 'path', 'x': 85, 'y': 99, 'd': 'l 85 0', 'stroke-dasharray': '10,10', 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
-        {'type': 'polyline', 'x': 170, 'y': 94, 'points': [0, 0, 10, 5, 0, 10], 'fill': 'black'},
+        {'type': 'path', 'x': 80, 'y': 99, 'd': 'l 85 0', 'stroke-dasharray': '10,10', 'style': 'fill:transparent; stroke: black; stroke-width: 2px;'},
+        {'type': 'polyline', 'x': 165, 'y': 94, 'points': [0, 0, 10, 5, 0, 10], 'fill': 'black'},
         // F char
-        {'type': 'text', 'textContent': 'F', 'x': 127, 'y': 92, 'style': 'stroke: black;'}
+        {'type': 'text', 'textContent': 'F', 'x': 124, 'y': 92, 'style': 'stroke: black;'}
       ]
     ];
     super(leftPoint, transfers);
     this.hat = [ 
-      {'type': 'polyline', 'x': 117, 'y': 9, 'points': [0, 0, 15, -5, 30, 0, 15, 5, 0, 0], 'fill': 'black'},
-      {'type': 'polyline', 'x': 124, 'y': 12, 'points': [0, 0, 8, 3, 17, 0, 17, 8, 8, 10, -2, 8, -2, -1], 'fill': 'black'},
-      {'type': 'line', 'x': 268, 'y': 150, 'points': [0, 0, 0, 5], 'style': 'stroke: black; stroke-width: 1px;'},
-      {'type': 'circle', 'x': 268, 'y': 156, 'r': 1},
-      {'type': 'polyline', 'x': 118, 'y': 14, 'points': [0, 0, 2, 7, -2, 7, 0, 0], 'fill': 'black'}
+      {'type': 'polyline', 'x': 114, 'y': 9, 'points': [0, 0, 15, -5, 30, 0, 15, 5, 0, 0], 'fill': 'black'},
+      {'type': 'polyline', 'x': 121, 'y': 12, 'points': [0, 0, 8, 3, 17, 0, 17, 8, 8, 10, -2, 8, -2, -1], 'fill': 'black'},
+      {'type': 'line', 'x': 265, 'y': 150, 'points': [0, 0, 0, 5], 'style': 'stroke: black; stroke-width: 1px;'},
+      {'type': 'circle', 'x': 265, 'y': 156, 'r': 1},
+      {'type': 'polyline', 'x': 115, 'y': 14, 'points': [0, 0, 2, 7, -2, 7, 0, 0], 'fill': 'black'}
     ];
   }
   create(index, toLeft) {
