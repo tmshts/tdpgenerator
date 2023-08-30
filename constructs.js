@@ -1,6 +1,5 @@
 import { Instruct} from "./svg_handler.js";
 
-
 class Actor {
   constructor(bottomLeftPoint) {
     this.point = bottomLeftPoint;
@@ -63,7 +62,6 @@ class Agent extends Actor{
       this.instructs.push(new Instruct(this.point,this.getArm( 1, agentArm)));
   }
 }
-
 
 class Human extends Actor{
   constructor(bottomLeftPoint, cogniWork, engagement) {
@@ -216,7 +214,6 @@ class Arrow {
   }
 }
 
-
 class Supervision extends Arrow{
   constructor(leftPoint) {
     const levels = [
@@ -280,7 +277,6 @@ class Transfer extends Arrow{
   }
 }
  
-
 class Modality {
   constructor(leftPoint, rightPoint) {
     this.dist = rightPoint['x'] - leftPoint['x'];
@@ -334,7 +330,5 @@ class Modality {
       return arr
     }      
 }
-
-
 
 export {Human, Agent, PhysicalWork, Location, Supervision, Modality, Transfer};
